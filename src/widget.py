@@ -21,5 +21,5 @@ def mask_account_card(data: Union[str]) -> Union[str]:
 
 
 def get_date(date: Union[str]) -> Union[str]:
-    """Принимает строку, содержающую дату в формате ISO 8601, и возвращает строку с датой в формате ДД.ММ.ГГГГ"""
+    """Принимает строку, содержающую дату в формате ISO, и возвращает строку с датой в формате ДД.ММ.ГГГГ"""
     return datetime.fromisoformat(date).strftime("%d.%m.%Y")
