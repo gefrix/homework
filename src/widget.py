@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Union
 
 from src.masks import get_mask_account, get_mask_card_number
@@ -17,3 +18,8 @@ def mask_account_card(data: Union[str]) -> Union[str]:
         raise ValueError("Неизвестный формат номера")
 
     return f"{name} {masked}"
+
+
+def get_date(date: Union[str]) -> Union[str]:
+    """Принимает строку, содержающую дату в формате ISO 8601, и возвращает строку с датой в формате ДД.ММ.ГГГГ"""
+    return datetime.fromisoformat(date).strftime("%d.%m.%Y")
