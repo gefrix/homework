@@ -43,6 +43,7 @@
    - `tests/test_masks.py` — тесты функций маскировки карт и счетов.
    - `tests/test_widget.py` — тесты функций обработки строк с картами, счетами и датами.
    - `tests/test_processing.py` — тесты фильтрации и сортировки банковских операций.
+   - `tests/test_generators.py` — тесты генераторов для фильтрации транзакций, описаний операций и номеров карт.
 
 **Запуск всех тестов**
    - poetry run pytest
@@ -51,3 +52,40 @@
    - poetry run pytest --cov=src --cov-report=term-missing --cov-report=html:coverage_html_report
 
 **HTML-отчет покрытия создается в папке coverage_html_report. Текущее покрытие функционального кода: 100%.**
+
+### Генераторы
+
+Модуль `src/generators.py` добавляет функции для работы с большими списками транзакций через генераторы.
+
+1. **Фильтрация транзакций по валюте**
+   - `filter_by_currency(transactions, currency)` принимает список транзакций и код валюты.
+   - Возвращает итератор с транзакциями, у которых код валюты совпадает с указанным.
+
+Пример:
+`filter_by_currency(transactions, "USD")`
+
+2. **Получение описаний транзакций**
+   - `transaction_descriptions(transactions)` принимает список транзакций.
+   - По очереди возвращает описание каждой операции из ключа `description`.
+
+Пример:
+`transaction_descriptions(transactions)`
+
+3. **Генерация номеров банковских карт**
+   - `card_number_generator(start, stop)` генерирует номера карт от `start` до `stop` включительно.
+   - Номера возвращаются в формате `XXXX XXXX XXXX XXXX`.
+
+Пример:
+`card_number_generator(1, 5)`
+
+Результат:
+- `0000 0000 0000 0001`
+- `0000 0000 0000 0002`
+- `0000 0000 0000 0003`
+- `0000 0000 0000 0004`
+- `0000 0000 0000 0005`
+
+**Запуск тестов с HTML-отчетом покрытия**
+   - poetry run pytest --cov=src --cov-report=html:coverage_report
+
+**HTML-отчет покрытия создается в папке coverage_report.**
