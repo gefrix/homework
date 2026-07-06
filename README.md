@@ -45,6 +45,8 @@
    - `tests/test_processing.py` — тесты фильтрации и сортировки банковских операций.
    - `tests/test_generators.py` — тесты генераторов для фильтрации транзакций, описаний операций и номеров карт.
    - `tests/test_decorators.py` — тесты декоратора логирования выполнения функций.
+   - `tests/test_utils.py` — тесты чтения операций из JSON-файла.
+   - `tests/test_external_api.py` — тесты конвертации суммы операции в рубли через внешний API.
 
 **Запуск всех тестов**
    - poetry run pytest
@@ -132,5 +134,57 @@ my_function error: ZeroDivisionError. Inputs: (1, 0), {}
 
 **Запуск тестов с HTML-отчетом покрытия**
    - poetry run pytest --cov=src --cov-report=html:coverage_report
+
+**HTML-отчет покрытия создается в папке coverage_report.**
+
+### JSON, API и переменные окружения
+
+1. **Чтение операций из JSON**
+
+Модуль `src/utils.py` содержит функцию `load_operations_from_json(file_path)`.
+
+Функция:
+   - принимает путь к JSON-файлу;
+   - возвращает список словарей с финансовыми операциями;
+   - возвращает пустой список, если файл не найден;
+   - возвращает пустой список, если файл пустой, содержит некорректный JSON или данные не в формате списка.
+
+Файл с операциями находится по пути:
+   - `data/operations.json`
+
+2. **Конвертация суммы операции в рубли**
+
+Модуль `src/external_api.py` содержит функцию `convert_transaction_to_rub(transaction)`.
+
+Функция:
+   - принимает словарь с одной транзакцией;
+   - возвращает сумму операции в рублях типом `float`;
+   - для операций в рублях возвращает сумму без обращения к API;
+   - для операций в USD и EUR обращается к Exchange Rates Data API;
+   - берет API-ключ из переменной окружения `EXCHANGE_RATES_API_KEY`.
+
+3. **Переменные окружения**
+
+Для хранения API-ключа используется локальный файл `.env`.
+
+Пример содержимого `.env`:
+
+```env
+EXCHANGE_RATES_API_KEY=your_real_api_key
+```
+
+Файл `.env` не должен попадать в GitHub.
+
+Для примера в репозиторий добавлен файл `.env.example`:
+
+```env
+EXCHANGE_RATES_API_KEY=your_api_key_here
+```
+
+**Запуск тестов**
+   - poetry run pytest
+
+**Запуск тестов с HTML-отчетом покрытия**
+   - poetry run pytest --cov=src --cov-report=term-missing --cov-report=html:coverage_report
 
 **HTML-отчет покрытия создается в папке coverage_report.**
