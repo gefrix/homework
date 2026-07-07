@@ -216,3 +216,48 @@ EXCHANGE_RATES_API_KEY=your_api_key_here
 Лог-файлы перезаписываются при каждом новом запуске приложения.
 
 Папка `logs` добавлена в проект с помощью файла `logs/.gitkeep`. Сами `.log`-файлы можно не добавлять в Git, так как они создаются автоматически.
+
+### Чтение CSV и Excel-файлов
+
+Модуль `src/file_readers.py` добавляет функции для чтения финансовых операций из CSV- и Excel-файлов.
+
+1. **Чтение CSV**
+
+Функция `read_transactions_from_csv(file_path)`:
+   - принимает путь к CSV-файлу;
+   - считывает операции через стандартный модуль `csv`;
+   - возвращает список словарей;
+   - при ошибке чтения возвращает пустой список.
+
+Пример:
+
+```python
+transactions = read_transactions_from_csv("data/transactions.csv")
+```
+
+2. **Чтение Excel**
+
+Функция `read_transactions_from_excel(file_path)`:
+   - принимает путь к Excel-файлу `.xlsx`;
+   - считывает операции через `pandas`;
+   - возвращает список словарей;
+   - при ошибке чтения возвращает пустой список.
+
+Пример:
+
+```python
+transactions = read_transactions_from_excel("data/transactions_excel.xlsx")
+```
+
+Файлы с данными:
+
+- `data/transactions.csv`;
+- `data/transactions_excel.xlsx`.
+
+Для работы с Excel используется зависимость `openpyxl`, а для чтения таблиц — `pandas`.
+
+**Запуск тестов**
+   - poetry run pytest
+
+**Запуск HTML-отчета покрытия**
+   - poetry run pytest --cov=src --cov-report=html:coverage_report

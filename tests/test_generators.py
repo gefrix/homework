@@ -8,6 +8,7 @@ from src.generators import card_number_generator, filter_by_currency, transactio
 
 @pytest.fixture
 def transactions() -> list[dict[str, Any]]:
+    """Возвращает список тестовых транзакций."""
     return [
         {
             "id": 939719570,
@@ -50,18 +51,21 @@ def test_filter_by_currency(
     currency: str,
     expected_ids: list[int],
 ) -> None:
+    """Проверяет фильтрацию транзакций по валюте."""
     result = list(filter_by_currency(transactions, currency))
 
     assert [transaction["id"] for transaction in result] == expected_ids
 
 
 def test_filter_by_currency_empty_list() -> None:
+    """Проверяет фильтрацию пустого списка транзакций."""
     result = list(filter_by_currency([], "USD"))
 
     assert result == []
 
 
 def test_filter_by_currency_returns_iterator(transactions: list[dict[str, Any]]) -> None:
+    """Проверяет, что фильтрация по валюте возвращает итератор."""
     usd_transactions = filter_by_currency(transactions, "USD")
 
     assert isinstance(usd_transactions, Iterator)
@@ -70,6 +74,7 @@ def test_filter_by_currency_returns_iterator(transactions: list[dict[str, Any]])
 
 
 def test_transaction_descriptions(transactions: list[dict[str, Any]]) -> None:
+    """Проверяет последовательное получение описаний транзакций."""
     descriptions = transaction_descriptions(transactions)
 
     assert next(descriptions) == "Перевод организации"
@@ -92,10 +97,12 @@ def test_transaction_descriptions_with_different_data(
     data: list[dict[str, Any]],
     expected: list[str],
 ) -> None:
+    """Проверяет получение описаний для разных наборов данных."""
     assert list(transaction_descriptions(data)) == expected
 
 
 def test_transaction_descriptions_returns_iterator(transactions: list[dict[str, Any]]) -> None:
+    """Проверяет, что описания транзакций возвращаются итератором."""
     descriptions = transaction_descriptions(transactions)
 
     assert isinstance(descriptions, Iterator)
@@ -121,10 +128,12 @@ def test_transaction_descriptions_returns_iterator(transactions: list[dict[str, 
     ],
 )
 def test_card_number_generator(start: int, stop: int, expected: list[str]) -> None:
+    """Проверяет генерацию номеров карт в заданном диапазоне."""
     assert list(card_number_generator(start, stop)) == expected
 
 
 def test_card_number_generator_format() -> None:
+    """Проверяет формат сгенерированного номера карты."""
     card_number = next(card_number_generator(1234567890123456, 1234567890123456))
 
     assert card_number == "1234 5678 9012 3456"
@@ -133,6 +142,7 @@ def test_card_number_generator_format() -> None:
 
 
 def test_card_number_generator_stops_correctly() -> None:
+    """Проверяет корректное завершение генератора номеров карт."""
     card_numbers = card_number_generator(1, 1)
 
     assert next(card_numbers) == "0000 0000 0000 0001"
@@ -148,5 +158,6 @@ def test_card_number_generator_stops_correctly() -> None:
     ],
 )
 def test_card_number_generator_invalid_range(start: int, stop: int) -> None:
+    """Проверяет ошибку при недопустимом диапазоне номеров карт."""
     with pytest.raises(ValueError):
         next(card_number_generator(start, stop))

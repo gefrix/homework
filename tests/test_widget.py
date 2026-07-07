@@ -5,10 +5,12 @@ from src.widget import get_date, mask_account_card
 
 @pytest.fixture
 def card_data() -> str:
+    """Возвращает тестовую строку с картой."""
     return "Visa Classic 6831982476737658"
 
 
 def test_mask_account_card(card_data: str) -> None:
+    """Проверяет маскировку строки с картой."""
     assert mask_account_card(card_data) == "Visa Classic 6831 98** **** 7658"
 
 
@@ -22,6 +24,7 @@ def test_mask_account_card(card_data: str) -> None:
     ],
 )
 def test_mask_account_card_with_different_data(data: str, expected: str) -> None:
+    """Проверяет маскировку разных строк с картами и счетами."""
     assert mask_account_card(data) == expected
 
 
@@ -34,6 +37,7 @@ def test_mask_account_card_with_different_data(data: str, expected: str) -> None
     ],
 )
 def test_mask_account_card_with_invalid_data(data: str) -> None:
+    """Проверяет ошибку при некорректных данных карты или счета."""
     with pytest.raises(ValueError):
         mask_account_card(data)
 
@@ -47,6 +51,7 @@ def test_mask_account_card_with_invalid_data(data: str) -> None:
     ],
 )
 def test_get_date(date: str, expected: str) -> None:
+    """Проверяет преобразование даты в нужный формат."""
     assert get_date(date) == expected
 
 
@@ -59,5 +64,6 @@ def test_get_date(date: str, expected: str) -> None:
     ],
 )
 def test_get_date_with_invalid_data(date: str) -> None:
+    """Проверяет ошибку при некорректной строке даты."""
     with pytest.raises(ValueError):
         get_date(date)
