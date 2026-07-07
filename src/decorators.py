@@ -7,8 +7,11 @@ def log(filename: str | None = None) -> Callable[[Callable[..., Any]], Callable[
     """Логирует результат выполнения декорируемой функции в консоль или файл."""
 
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        """Оборачивает функцию логирующим wrapper."""
+
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
+            """Выполняет функцию и записывает результат в лог."""
             try:
                 result = func(*args, **kwargs)
                 message = f"{func.__name__} ok"
@@ -23,6 +26,7 @@ def log(filename: str | None = None) -> Callable[[Callable[..., Any]], Callable[
         return wrapper
 
     def write_log(message: str) -> None:
+        """Записывает сообщение в файл или консоль."""
         if filename:
             with open(filename, "a", encoding="utf-8") as file:
                 file.write(message + "\n")

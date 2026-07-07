@@ -7,6 +7,7 @@ from src.file_readers import read_transactions_from_csv, read_transactions_from_
 
 
 def test_read_transactions_from_csv_success() -> None:
+    """Проверяет, что транзакции из CSV читаются как список словарей."""
     csv_content = "id,state,amount\n1,EXECUTED,100\n2,CANCELED,200\n"
 
     with patch("builtins.open", mock_open(read_data=csv_content)) as mocked_open:
@@ -27,16 +28,19 @@ def test_read_transactions_from_csv_success() -> None:
     ],
 )
 def test_read_transactions_from_csv_error(side_effect: type[Exception]) -> None:
+    """Проверяет, что при ошибке чтения CSV возвращается пустой список."""
     with patch("builtins.open", side_effect=side_effect):
         assert read_transactions_from_csv("missing.csv") == []
 
 
 def test_read_transactions_from_csv_empty_file() -> None:
+    """Проверяет, что для пустого CSV-файла возвращается пустой список."""
     with patch("builtins.open", mock_open(read_data="")):
         assert read_transactions_from_csv("empty.csv") == []
 
 
 def test_read_transactions_from_csv_uses_dict_reader() -> None:
+    """Проверяет, что CSV-файл читается через csv.DictReader."""
     reader = Mock()
     reader.return_value = [{"id": "1", "state": "EXECUTED"}]
 
@@ -51,6 +55,7 @@ def test_read_transactions_from_csv_uses_dict_reader() -> None:
 
 
 def test_read_transactions_from_excel_success() -> None:
+    """Проверяет, что транзакции из Excel читаются как список словарей."""
     dataframe = pd.DataFrame(
         [
             {"id": 1, "state": "EXECUTED", "amount": 100},
@@ -77,11 +82,13 @@ def test_read_transactions_from_excel_success() -> None:
     ],
 )
 def test_read_transactions_from_excel_error(side_effect: type[Exception]) -> None:
+    """Проверяет, что при ошибке чтения Excel возвращается пустой список."""
     with patch("src.file_readers.pd.read_excel", side_effect=side_effect):
         assert read_transactions_from_excel("missing.xlsx") == []
 
 
 def test_read_transactions_from_excel_empty_result() -> None:
+    """Проверяет, что для пустой Excel-таблицы возвращается пустой список."""
     dataframe = pd.DataFrame()
 
     with patch("src.file_readers.pd.read_excel", return_value=dataframe):

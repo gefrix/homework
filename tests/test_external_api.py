@@ -7,6 +7,7 @@ from src.external_api import convert_transaction_to_rub
 
 
 def make_transaction(amount: str, currency: str) -> dict:
+    """Создает тестовую транзакцию с суммой и валютой."""
     return {
         "operationAmount": {
             "amount": amount,
@@ -18,6 +19,7 @@ def make_transaction(amount: str, currency: str) -> dict:
 
 
 def test_convert_transaction_to_rub_with_rub() -> None:
+    """Проверяет возврат рублевой суммы без обращения к API."""
     transaction = make_transaction("100.50", "RUB")
 
     with patch("src.external_api.requests.get") as mock_get:
@@ -40,6 +42,7 @@ def test_convert_transaction_to_rub_with_api(
     api_result: float,
     expected: float,
 ) -> None:
+    """Проверяет конвертацию USD и EUR через внешний API."""
     transaction = make_transaction(amount, currency)
     response = Mock()
     response.json.return_value = {"result": api_result}
@@ -71,6 +74,7 @@ def test_convert_transaction_to_rub_with_api(
 
 
 def test_convert_transaction_to_rub_without_api_key() -> None:
+    """Проверяет ошибку при отсутствии API-ключа."""
     transaction = make_transaction("10.00", "USD")
 
     with (
@@ -85,6 +89,7 @@ def test_convert_transaction_to_rub_without_api_key() -> None:
 
 
 def test_convert_transaction_to_rub_unsupported_currency() -> None:
+    """Проверяет ошибку для неподдерживаемой валюты."""
     transaction = make_transaction("10.00", "GBP")
 
     with pytest.raises(ValueError, match="Unsupported currency"):
@@ -92,6 +97,7 @@ def test_convert_transaction_to_rub_unsupported_currency() -> None:
 
 
 def test_convert_transaction_to_rub_without_result_in_response() -> None:
+    """Проверяет ошибку при отсутствии результата в ответе API."""
     transaction = make_transaction("10.00", "USD")
     response = Mock()
     response.json.return_value = {"success": True}
@@ -107,6 +113,7 @@ def test_convert_transaction_to_rub_without_result_in_response() -> None:
 
 
 def test_convert_transaction_to_rub_api_error() -> None:
+    """Проверяет проброс ошибки внешнего API."""
     transaction = make_transaction("10.00", "USD")
     response = Mock()
     response.raise_for_status.side_effect = requests.HTTPError("API error")
