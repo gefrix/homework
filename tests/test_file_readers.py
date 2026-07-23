@@ -93,3 +93,16 @@ def test_read_transactions_from_excel_empty_result() -> None:
 
     with patch("src.file_readers.pd.read_excel", return_value=dataframe):
         assert read_transactions_from_excel("empty.xlsx") == []
+
+
+def test_read_transactions_from_csv_with_semicolon_delimiter() -> None:
+    """Проверяет чтение CSV-файла с разделителем-точкой с запятой."""
+    csv_content = "id;state;amount\n" "1;EXECUTED;100\n" "2;CANCELED;200\n"
+
+    with patch("builtins.open", mock_open(read_data=csv_content)):
+        result = read_transactions_from_csv("data/transactions.csv")
+
+    assert result == [
+        {"id": "1", "state": "EXECUTED", "amount": "100"},
+        {"id": "2", "state": "CANCELED", "amount": "200"},
+    ]
