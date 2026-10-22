@@ -413,3 +413,9 @@ poetry run pytest
 poetry run pytest --cov=src --cov-report=html:coverage_report
 poetry run mypy src
 ```
+
+## Домашняя работа 22 — Skystore на Django
+
+Продолжение учебного сайта находится в каталоге `lesson_22`. Проект содержит Django-приложение `catalog`, страницы каталога и контактов, статические файлы Bootstrap-интерфейса и форму обратной связи.
+
+Инструкция по запуску и проверке находится в `lesson_22/README.md`.
