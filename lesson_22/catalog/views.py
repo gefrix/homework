@@ -1,53 +1,13 @@
+from catalog.models import Contact, Product
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-
-PRODUCTS = [
-    {
-        'name': 'Удобный сервис рассылок',
-        'price': 140,
-        'features': [
-            'Неограниченная лицензия',
-            'Поддержка',
-            'Установка на сервер',
-            'Получение обновлений',
-        ],
-    },
-    {
-        'name': 'Telegram-бот для бизнеса',
-        'price': 120,
-        'features': [
-            'Готовый сценарий',
-            'Настройка команд',
-            'Подключение к API',
-            'Техническая поддержка',
-        ],
-    },
-    {
-        'name': 'Набор полезных утилит',
-        'price': 90,
-        'features': [
-            'Пять приложений',
-            'Исходный код',
-            'Документация',
-            'Бесплатные обновления',
-        ],
-    },
-    {
-        'name': 'Шаблон веб-приложения',
-        'price': 180,
-        'features': [
-            'Адаптивный интерфейс',
-            'Панель управления',
-            'Готовые страницы',
-            'Помощь с запуском',
-        ],
-    },
-]
 
 
 def home(request: HttpRequest) -> HttpResponse:
     """Отобразить главную страницу интернет-магазина."""
-    return render(request, 'catalog/home.html', {'products': PRODUCTS})
+    products = Product.objects.select_related('category').order_by('-created_at')[:5]
+    print('Последние пять товаров:', list(products))
+    return render(request, 'catalog/home.html', {'products': products})
 
 
 def contacts(request: HttpRequest) -> HttpResponse:
@@ -66,5 +26,8 @@ def contacts(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         'catalog/contacts.html',
-        {'success_message': success_message},
+        {
+            'contact': Contact.objects.filter(is_active=True).first(),
+            'success_message': success_message,
+        },
     )
