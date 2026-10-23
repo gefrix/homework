@@ -1,0 +1,40 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Новый товар — Skystore{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="form-shell mx-auto">
+        <header class="text-center mb-4">
+            <p class="text-primary fw-semibold mb-2">Расширяем каталог</p>
+            <h1 class="display-5 fw-semibold">Добавить товар</h1>
+            <p class="text-body-secondary">Заполните все поля — после сохранения откроется страница нового товара.</p>
+        </header>
+
+        <form class="card border-0 shadow-sm" method="post" enctype="multipart/form-data">
+            <div class="card-body p-4 p-md-5">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                {% for field in form %}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                    {% for error in field.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                    <button class="btn btn-primary btn-lg flex-grow-1" type="submit">Сохранить товар</button>
+                    <a class="btn btn-outline-secondary btn-lg" href="{% url 'catalog:home' %}">Отмена</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
