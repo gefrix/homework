@@ -19,19 +19,23 @@
         {% for product in products %}
         <div class="col">
             <article class="card h-100 product-card shadow-sm">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% endif %}
                 <div class="card-header bg-white py-3">
                     <h3 class="h5 mb-0">{{ product.name }}</h3>
                 </div>
                 <div class="card-body d-flex flex-column">
                     <p class="display-6 fw-semibold">$ {{ product.price }}</p>
-                    <ul class="list-unstyled text-start mb-4">
-                        {% for feature in product.features %}
-                        <li class="mb-2">— {{ feature }}</li>
-                        {% endfor %}
-                    </ul>
+                    <p class="text-primary fw-semibold">{{ product.category.name }}</p>
+                    <p class="text-body-secondary">{{ product.description|truncatechars:120 }}</p>
                     <button type="button" class="btn btn-lg btn-outline-primary mt-auto">Купить</button>
                 </div>
             </article>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="alert alert-info text-center">Каталог пока пуст. Загрузите тестовые товары.</p>
         </div>
         {% endfor %}
     </div>

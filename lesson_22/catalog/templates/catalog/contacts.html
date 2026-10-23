@@ -21,9 +21,15 @@
                     <div class="table-responsive">
                         <table class="table table-striped align-middle mb-0">
                             <tbody>
-                            <tr><th scope="row" class="w-25">Страна</th><td>USA</td></tr>
-                            <tr><th scope="row">ИНН</th><td>91-1144442</td></tr>
-                            <tr><th scope="row">Адрес</th><td>Redmond, WA, 98052-6399</td></tr>
+                            {% if contact %}
+                            <tr><th scope="row" class="w-25">Страна</th><td>{{ contact.country }}</td></tr>
+                            <tr><th scope="row">ИНН</th><td>{{ contact.tax_id }}</td></tr>
+                            <tr><th scope="row">Адрес</th><td>{{ contact.address }}</td></tr>
+                            <tr><th scope="row">Телефон</th><td>{{ contact.phone }}</td></tr>
+                            <tr><th scope="row">E-mail</th><td>{{ contact.email }}</td></tr>
+                            {% else %}
+                            <tr><td colspan="2">Контактные данные скоро появятся.</td></tr>
+                            {% endif %}
                             </tbody>
                         </table>
                     </div>

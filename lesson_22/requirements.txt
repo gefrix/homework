@@ -1,1 +1,5 @@
 Django==6.1.2
+ipython==9.17.1
+Pillow==13.0.0
+psycopg2-binary==2.9.13
+python-dotenv==1.2.2
