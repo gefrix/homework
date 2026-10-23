@@ -1,0 +1,36 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{{ product.name }} — Skystore{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <a class="back-link d-inline-flex align-items-center mb-4" href="{% url 'catalog:home' %}">← Вернуться в каталог</a>
+
+    <article class="card border-0 shadow-sm overflow-hidden">
+        <div class="row g-0">
+            <div class="col-12 col-lg-5 product-detail-media">
+                {% if product.image %}
+                <img class="w-100 h-100 object-fit-cover" src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                <div class="product-detail-placeholder h-100 d-flex align-items-center justify-content-center">SKY</div>
+                {% endif %}
+            </div>
+            <div class="col-12 col-lg-7">
+                <div class="card-body p-4 p-md-5">
+                    <p class="text-primary fw-semibold mb-2">{{ product.category.name }}</p>
+                    <h1 class="display-5 fw-semibold mb-3">{{ product.name }}</h1>
+                    <p class="display-6 fw-semibold text-primary mb-4">$ {{ product.price }}</p>
+                    <h2 class="h5">Описание</h2>
+                    <p class="text-body-secondary product-description">{{ product.description|linebreaksbr }}</p>
+                    <dl class="row small text-body-secondary border-top pt-4 mt-4 mb-0">
+                        <dt class="col-sm-5">Создан</dt>
+                        <dd class="col-sm-7">{{ product.created_at|date:'d.m.Y H:i' }}</dd>
+                        <dt class="col-sm-5">Обновлён</dt>
+                        <dd class="col-sm-7 mb-0">{{ product.updated_at|date:'d.m.Y H:i' }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
+{% endblock %}

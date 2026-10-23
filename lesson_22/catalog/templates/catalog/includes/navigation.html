@@ -1,0 +1,13 @@
+<header class="border-bottom bg-white shadow-sm">
+    <nav class="container d-flex flex-column flex-md-row align-items-center justify-content-between py-3" aria-label="Основная навигация">
+        <a class="navbar-brand fw-semibold fs-4 mb-3 mb-md-0" href="{% url 'catalog:home' %}">Skystore</a>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a class="btn {% if request.resolver_match.url_name == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+               href="{% url 'catalog:home' %}">Каталог</a>
+            <a class="btn {% if request.resolver_match.url_name == 'product_create' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+               href="{% url 'catalog:product_create' %}">Добавить товар</a>
+            <a class="btn {% if request.resolver_match.url_name == 'contacts' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+               href="{% url 'catalog:contacts' %}">Контакты</a>
+        </div>
+    </nav>
+</header>
