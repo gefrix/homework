@@ -35,7 +35,7 @@ class CatalogViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'catalog/home.html')
-        self.assertTemplateUsed(response, 'catalog/includes/navigation.html')
+        self.assertTemplateUsed(response, 'catalog/includes/menu.html')
         self.assertContains(response, 'Skystore')
         self.assertEqual(len(response.context['products']), 4)
         self.assertContains(response, 'page=2')
