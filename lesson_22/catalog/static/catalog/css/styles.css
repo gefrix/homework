@@ -68,6 +68,36 @@ body {
     max-width: 760px;
 }
 
+.blog-image-placeholder {
+    display: grid;
+    aspect-ratio: 16 / 9;
+    color: rgb(13 110 253 / 42%);
+    background: linear-gradient(135deg, #eaf2ff 0%, #f6f8fc 100%);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    place-items: center;
+}
+
+.blog-article {
+    max-width: 960px;
+}
+
+.blog-hero-image {
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+}
+
+.blog-content {
+    font-size: 1.1rem;
+    line-height: 1.85;
+}
+
+.delete-card {
+    max-width: 640px;
+}
+
 .footer-link {
     color: var(--bs-secondary-color);
     line-height: 2;

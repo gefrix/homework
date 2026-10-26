@@ -6,6 +6,8 @@
                href="{% url 'catalog:home' %}">Каталог</a>
             <a class="btn {% if request.resolver_match.url_name == 'product_create' %}btn-primary{% else %}btn-outline-primary{% endif %}"
                href="{% url 'catalog:product_create' %}">Добавить товар</a>
+            <a class="btn {% if request.resolver_match.app_name == 'blog' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+               href="{% url 'blog:blog_list' %}">Блог</a>
             <a class="btn {% if request.resolver_match.url_name == 'contacts' %}btn-primary{% else %}btn-outline-primary{% endif %}"
                href="{% url 'catalog:contacts' %}">Контакты</a>
         </div>
