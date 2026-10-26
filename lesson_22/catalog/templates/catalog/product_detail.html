@@ -28,6 +28,10 @@
                         <dt class="col-sm-5">Обновлён</dt>
                         <dd class="col-sm-7 mb-0">{{ product.updated_at|date:'d.m.Y H:i' }}</dd>
                     </dl>
+                    <div class="d-flex flex-column flex-sm-row gap-2 border-top pt-4 mt-4">
+                        <a class="btn btn-primary" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+                        <a class="btn btn-outline-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
+                    </div>
                 </div>
             </div>
         </div>

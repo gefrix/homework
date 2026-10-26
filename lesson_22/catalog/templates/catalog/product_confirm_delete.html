@@ -1,0 +1,24 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Удаление {{ product.name }} — Skystore{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="card border-0 shadow-sm delete-card mx-auto text-center">
+        <div class="card-body p-4 p-md-5">
+            <p class="text-danger fw-semibold">Необратимое действие</p>
+            <h1 class="h2 mb-3">Удалить товар?</h1>
+            <p class="text-body-secondary mb-4">
+                «{{ product.name }}» будет удалён без возможности восстановления.
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-grid gap-2">
+                    <button class="btn btn-danger" type="submit">Удалить</button>
+                    <a class="btn btn-outline-secondary" href="{% url 'catalog:product_detail' product.pk %}">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
