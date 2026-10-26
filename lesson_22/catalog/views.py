@@ -2,9 +2,9 @@ from catalog.forms import ProductForm
 from catalog.models import Contact, Product
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 
 class ProductListView(ListView):
@@ -39,6 +39,25 @@ class ProductCreateView(CreateView):
 
     def get_success_url(self) -> str:
         return reverse('catalog:product_detail', kwargs={'pk': self.object.pk})
+
+
+class ProductUpdateView(UpdateView):
+    """Отредактировать товар из данных валидной формы."""
+
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+
+    def get_success_url(self) -> str:
+        return reverse('catalog:product_detail', kwargs={'pk': self.object.pk})
+
+
+class ProductDeleteView(DeleteView):
+    """Удалить товар после подтверждения."""
+
+    model = Product
+    template_name = 'catalog/product_confirm_delete.html'
+    success_url = reverse_lazy('catalog:home')
 
 
 class ContactView(View):

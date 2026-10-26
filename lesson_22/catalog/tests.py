@@ -1,15 +1,34 @@
 from decimal import Decimal
+from io import BytesIO
 from tempfile import TemporaryDirectory
 
 from catalog.admin import CategoryAdmin, ProductAdmin
-from catalog.forms import ProductForm
+from catalog.forms import MAX_IMAGE_SIZE, ProductForm
 from catalog.models import Category, Contact, Product
-from catalog.views import ContactView, ProductCreateView, ProductDetailView, ProductListView
+from catalog.views import (
+    ContactView,
+    ProductCreateView,
+    ProductDeleteView,
+    ProductDetailView,
+    ProductListView,
+    ProductUpdateView,
+)
 from django.contrib import admin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import SimpleTestCase, TestCase
 from django.urls import resolve, reverse
+from PIL import Image
+
+
+def create_uploaded_image(
+    name: str = 'product.png', image_format: str = 'PNG', extra_bytes: int = 0
+) -> SimpleUploadedFile:
+    """Создать настоящее тестовое изображение без файлов в репозитории."""
+    buffer = BytesIO()
+    Image.new('RGB', (2, 2), color='blue').save(buffer, format=image_format)
+    content_type = f'image/{"jpeg" if image_format == "JPEG" else image_format.lower()}'
+    return SimpleUploadedFile(name, buffer.getvalue() + b'0' * extra_bytes, content_type=content_type)
 
 
 class CatalogViewsTests(TestCase):
@@ -99,15 +118,7 @@ class CatalogViewsTests(TestCase):
     def test_valid_product_is_saved_and_redirected_to_detail(self) -> None:
         category = Category.objects.first()
         assert category is not None
-        image = SimpleUploadedFile(
-            'product.gif',
-            (
-                b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff'
-                b'!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00'
-                b'\x00\x02\x02D\x01\x00;'
-            ),
-            content_type='image/gif',
-        )
+        image = create_uploaded_image()
 
         with TemporaryDirectory() as media_root, self.settings(MEDIA_ROOT=media_root):
             response = self.client.post(
@@ -123,6 +134,37 @@ class CatalogViewsTests(TestCase):
 
         product = Product.objects.get(name='Новый товар')
         self.assertRedirects(response, reverse('catalog:product_detail', kwargs={'pk': product.pk}))
+
+    def test_product_can_be_updated(self) -> None:
+        product = Product.objects.first()
+        category = Category.objects.first()
+        assert product is not None
+        assert category is not None
+
+        with TemporaryDirectory() as media_root, self.settings(MEDIA_ROOT=media_root):
+            response = self.client.post(
+                reverse('catalog:product_update', kwargs={'pk': product.pk}),
+                {
+                    'name': 'Обновлённый товар',
+                    'description': 'Новое описание',
+                    'category': category.pk,
+                    'price': '349.90',
+                    'image': create_uploaded_image(),
+                },
+            )
+
+        product.refresh_from_db()
+        self.assertEqual(product.name, 'Обновлённый товар')
+        self.assertRedirects(response, reverse('catalog:product_detail', kwargs={'pk': product.pk}))
+
+    def test_product_can_be_deleted(self) -> None:
+        product = Product.objects.first()
+        assert product is not None
+
+        response = self.client.post(reverse('catalog:product_delete', kwargs={'pk': product.pk}))
+
+        self.assertRedirects(response, reverse('catalog:home'))
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
 
     def test_contacts_page_is_available(self) -> None:
         response = self.client.get(reverse('catalog:contacts'))
@@ -172,19 +214,87 @@ class CatalogModelsTests(TestCase):
 
 
 class ProductFormTests(TestCase):
-    def test_price_must_be_positive(self) -> None:
-        category = Category.objects.create(name='Формы')
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.category = Category.objects.create(name='Формы')
+
+    def form_data(self, **overrides: str) -> dict[str, str | int]:
+        data: dict[str, str | int] = {
+            'name': 'Полезный товар',
+            'description': 'Подробное описание продукта',
+            'category': self.category.pk,
+            'price': '100.00',
+        }
+        data.update(overrides)
+        return data
+
+    def test_forbidden_words_are_rejected_in_name_and_description_case_insensitively(self) -> None:
+        cases = (
+            {'name': 'БЕСПЛАТНО для всех'},
+            {'description': 'Новая КрипТоВалюта для клиентов'},
+        )
+
+        for values in cases:
+            with self.subTest(values=values):
+                form = ProductForm(data=self.form_data(**values), files={'image': create_uploaded_image()})
+
+                self.assertFalse(form.is_valid())
+                field_name = next(iter(values))
+                self.assertIn(field_name, form.errors)
+                self.assertIn('запрещённые слова', form.errors[field_name][0])
+
+    def test_price_must_not_be_negative(self) -> None:
         form = ProductForm(
-            data={
-                'name': 'Товар',
-                'description': 'Описание',
-                'category': category.pk,
-                'price': '0',
-            }
+            data=self.form_data(price='-0.01'),
+            files={'image': create_uploaded_image()},
         )
 
         self.assertFalse(form.is_valid())
         self.assertIn('price', form.errors)
+        self.assertIn('не может быть отрицательной', form.errors['price'][0])
+
+    def test_zero_price_is_allowed(self) -> None:
+        form = ProductForm(
+            data=self.form_data(price='0'),
+            files={'image': create_uploaded_image()},
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_all_form_fields_receive_bootstrap_styles_in_init(self) -> None:
+        form = ProductForm()
+
+        for field in form.fields.values():
+            expected_class = 'form-select' if field is form.fields['category'] else 'form-control'
+            self.assertEqual(field.widget.attrs['class'], expected_class)
+
+    def test_jpeg_and_png_images_are_allowed(self) -> None:
+        for name, image_format in (('product.jpg', 'JPEG'), ('product.png', 'PNG')):
+            with self.subTest(image_format=image_format):
+                form = ProductForm(
+                    data=self.form_data(),
+                    files={'image': create_uploaded_image(name, image_format)},
+                )
+
+                self.assertTrue(form.is_valid(), form.errors)
+
+    def test_gif_image_is_rejected(self) -> None:
+        form = ProductForm(
+            data=self.form_data(),
+            files={'image': create_uploaded_image('product.gif', 'GIF')},
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('JPEG и PNG', form.errors['image'][0])
+
+    def test_image_larger_than_five_megabytes_is_rejected(self) -> None:
+        form = ProductForm(
+            data=self.form_data(),
+            files={'image': create_uploaded_image(extra_bytes=MAX_IMAGE_SIZE)},
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('5 МБ', form.errors['image'][0])
 
 
 class CatalogAdminTests(SimpleTestCase):
@@ -207,6 +317,8 @@ class CatalogCBVTests(SimpleTestCase):
             ('catalog:home', {}, ProductListView),
             ('catalog:product_create', {}, ProductCreateView),
             ('catalog:product_detail', {'pk': 1}, ProductDetailView),
+            ('catalog:product_update', {'pk': 1}, ProductUpdateView),
+            ('catalog:product_delete', {'pk': 1}, ProductDeleteView),
             ('catalog:contacts', {}, ContactView),
         )
 
