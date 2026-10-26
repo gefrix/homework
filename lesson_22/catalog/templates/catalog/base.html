@@ -10,15 +10,7 @@
     <link href="{% static 'catalog/css/styles.css' %}" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100">
-<header class="border-bottom bg-white shadow-sm">
-    <nav class="container d-flex flex-column flex-md-row align-items-center justify-content-between py-3" aria-label="Основная навигация">
-        <a class="navbar-brand fw-semibold fs-4 mb-3 mb-md-0" href="{% url 'catalog:home' %}">Skystore</a>
-        <div class="d-flex gap-2">
-            <a class="btn btn-outline-primary" href="{% url 'catalog:home' %}">Каталог</a>
-            <a class="btn btn-outline-primary" href="{% url 'catalog:contacts' %}">Контакты</a>
-        </div>
-    </nav>
-</header>
+{% include 'catalog/includes/menu.html' %}
 
 <main class="flex-grow-1">
     {% block content %}{% endblock %}
