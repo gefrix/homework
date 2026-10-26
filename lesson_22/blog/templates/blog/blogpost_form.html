@@ -1,0 +1,40 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{% if object %}Редактирование статьи{% else %}Новая статья{% endif %} — Skystore{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="form-shell mx-auto">
+        <header class="text-center mb-4">
+            <p class="text-primary fw-semibold mb-2">Блог Skystore</p>
+            <h1 class="display-5 fw-semibold">{% if object %}Редактировать статью{% else %}Добавить статью{% endif %}</h1>
+        </header>
+
+        <form class="card border-0 shadow-sm" method="post" enctype="multipart/form-data">
+            <div class="card-body p-4 p-md-5">
+                {% csrf_token %}
+                {% for field in form %}
+                    {% if field.name == 'is_published' %}
+                    <div class="form-check mb-4">
+                        {{ field }}
+                        <label class="form-check-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                    <button class="btn btn-primary btn-lg flex-grow-1" type="submit">Сохранить</button>
+                    <a class="btn btn-outline-secondary btn-lg" href="{% if object %}{% url 'blog:blog_detail' object.pk %}{% else %}{% url 'blog:blog_list' %}{% endif %}">Отмена</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -4,11 +4,12 @@ from tempfile import TemporaryDirectory
 from catalog.admin import CategoryAdmin, ProductAdmin
 from catalog.forms import ProductForm
 from catalog.models import Category, Contact, Product
+from catalog.views import ContactView, ProductCreateView, ProductDetailView, ProductListView
 from django.contrib import admin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import SimpleTestCase, TestCase
-from django.urls import reverse
+from django.urls import resolve, reverse
 
 
 class CatalogViewsTests(TestCase):
@@ -198,3 +199,18 @@ class CatalogAdminTests(SimpleTestCase):
         self.assertEqual(model_admin.list_display, ('id', 'name', 'price', 'category'))
         self.assertEqual(model_admin.list_filter, ('category',))
         self.assertEqual(model_admin.search_fields, ('name', 'description'))
+
+
+class CatalogCBVTests(SimpleTestCase):
+    def test_all_catalog_routes_use_cbv(self) -> None:
+        routes = (
+            ('catalog:home', {}, ProductListView),
+            ('catalog:product_create', {}, ProductCreateView),
+            ('catalog:product_detail', {'pk': 1}, ProductDetailView),
+            ('catalog:contacts', {}, ContactView),
+        )
+
+        for route_name, kwargs, view_class in routes:
+            url = reverse(route_name, kwargs=kwargs)
+            self.assertTrue(url.endswith('/'))
+            self.assertIs(resolve(url).func.view_class, view_class)
